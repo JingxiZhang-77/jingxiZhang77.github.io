@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Coding Blog</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 40px; line-height: 1.5; }
+    header { margin-bottom: 24px; }
+    nav a { margin-right: 14px; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0; }
+    .muted { color: #666; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Coding Blog</h1>
+    <p class="muted">Notes, assignments, and small projects.</p>
+    <nav>
+      <a href="./index.html">Home</a>
+      <a href="./posts.html">Posts</a>
+      <a href="./about.html">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Welcome</h2>
+      <p>This is my homepage on GitHub Pages. I will keep adding new pages for future assignments.</p>
+    </div>
+
+    <div class="card">
+      <h2>Latest</h2>
+      <ul>
+        <li><a href="./posts.html">Post list</a> (add future assignments here)</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="muted">
+    <p>© <span id="y"></span> My Coding Blog</p>
+  </footer>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
