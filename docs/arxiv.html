@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>arXiv Auto-Update</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .paper{margin-bottom:18px;padding:12px;border-radius:8px;background:#fff}
+      .paper h3{margin:0 0 6px;font-size:18px}
+      .meta{color:#666;font-size:13px;margin-bottom:8px}
+      .abstract{font-size:14px;color:#222}
+      .controls{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+      .query{font-weight:600;color:var(--accent)}
+      .btn{background:var(--accent);color:white;padding:8px 10px;border-radius:6px;border:none;cursor:pointer}
+      .small{font-size:13px;color:#555}
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>arXiv Auto-Update</h1>
+      <p class="tagline">Latest papers (auto-updated daily). Query: <span id="query-string">(loading...)</span></p>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <div class="controls">
+          <button id="refresh" class="btn">Refresh now</button>
+          <div class="small">Last fetched: <span id="fetched-at">—</span></div>
+        </div>
+        <div id="papers" class="papers-list">Loading latest papers…</div>
+        <p class="small">This list is refreshed nightly via GitHub Actions; you can also refresh manually.</p>
+        <p><a href="index.html">Return to Home</a></p>
+      </section>
+    </main>
+
+    <script>
+      function tsToLocal(ts){
+        if(!ts) return '—';
+        try{ return new Date(ts*1000).toLocaleString(); }catch(e){return ts}
+      }
+
+      async function loadPapers(){
+        const container = document.getElementById('papers');
+        container.textContent = 'Loading latest papers…';
+        try{
+          const res = await fetch('arxiv_data.json?cb=' + Date.now(), {cache: 'no-store'});
+          if(!res.ok) throw new Error('Network response not ok');
+          const data = await res.json();
+          document.getElementById('query-string').textContent = data.query || 'default';
+          document.getElementById('fetched-at').textContent = tsToLocal(data.fetched_at);
+          container.innerHTML = '';
+          if(data.error){ container.innerHTML = '<strong>Failed to fetch papers:</strong> '+data.error; return }
+          if(!data.papers || data.papers.length===0){ container.textContent = 'No papers found.'; return }
+          for(const p of data.papers){
+            const el = document.createElement('article'); el.className='paper';
+            const title = document.createElement('h3');
+            const a = document.createElement('a'); a.href = p.pdf || p.id; a.target='_blank'; a.rel='noopener'; a.textContent = p.title || 'Untitled';
+            title.appendChild(a);
+
+            const meta = document.createElement('div'); meta.className='meta';
+            const authors = document.createElement('span'); authors.className='authors'; authors.textContent = (p.authors||[]).join(', ');
+            meta.appendChild(authors);
+            if(p.updated){ const upd = document.createElement('span'); upd.textContent = ' — '+p.updated; meta.appendChild(upd); }
+
+            const absText = p.summary || '';
+            const abs = document.createElement('div'); abs.className='abstract';
+            const actions = document.createElement('div'); actions.className='actions';
+
+            if(absText.length > 350){
+              const short = absText.slice(0,350) + '…';
+              abs.textContent = short;
+              const btn = document.createElement('button'); btn.className='show-more'; btn.textContent='Show more';
+              btn.addEventListener('click', ()=>{
+                if(btn.textContent === 'Show more'){
+                  abs.textContent = absText; btn.textContent = 'Show less';
+                } else { abs.textContent = short; btn.textContent = 'Show more'; }
+              });
+              actions.appendChild(btn);
+            } else {
+              abs.textContent = absText;
+            }
+
+            const pdfLink = document.createElement('a'); pdfLink.className='pdf-link'; pdfLink.href = p.pdf || p.id; pdfLink.target='_blank'; pdfLink.rel='noopener'; pdfLink.textContent='PDF';
+            actions.insertBefore(pdfLink, actions.firstChild);
+
+            el.appendChild(title); el.appendChild(meta); el.appendChild(abs); el.appendChild(actions);
+            container.appendChild(el);
+          }
+        }catch(err){
+          container.textContent = 'Failed to load papers.';
+          console.error(err);
+        }
+      }
+
+      document.getElementById('refresh').addEventListener('click', ()=>{ loadPapers(); });
+      // load on page open
+      loadPapers();
+    </script>
+  </body>
+</html>

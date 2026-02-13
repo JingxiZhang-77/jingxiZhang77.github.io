@@ -1,0 +1,38 @@
+:root{
+  --bg:#fff8fb;
+  --card:#ffffff;
+  --accent:#e94f73;
+  --muted:#666;
+}
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui,Segoe UI,Helvetica,Arial;line-height:1.5;margin:0;background:var(--bg);color:#111}
+.site-header{background:linear-gradient(90deg,#ffd6e0, #fff);padding:36px 20px;text-align:center;border-bottom:1px solid #f1dbe2}
+.site-header h1{margin:0 0 8px;font-size:28px;color:var(--accent)}
+.tagline{margin:0;color:var(--muted)}
+.content{max-width:900px;margin:28px auto;padding:0 16px;display:grid;grid-template-columns:1fr;gap:18px}
+.card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.04)}
+.links ul{padding-left:18px;margin:0}
+.links a{color:var(--accent);text-decoration:none;font-weight:600}
+.site-footer{text-align:center;padding:18px;color:var(--muted);font-size:13px}
+
+@media(min-width:700px){
+  .content{grid-template-columns:2fr 1fr}
+}
+
+/* arXiv page specific styles */
+.arxiv-header{padding:18px 20px 6px}
+.papers-list{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+.paper{display:block;padding:16px;border-radius:12px;background:linear-gradient(180deg,#fff,#fffefc);border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.paper h3{font-size:18px;margin:0 0 6px}
+.paper a{color:var(--accent);text-decoration:none}
+.paper a:hover{text-decoration:underline}
+.meta{color:var(--muted);font-size:13px;margin-bottom:8px}
+.abstract{font-size:14px;color:#222;line-height:1.4;margin-top:6px}
+.meta .authors{font-weight:600}
+.paper .actions{margin-top:10px;display:flex;gap:8px;align-items:center}
+.pdf-link{background:#f7f7f7;border-radius:6px;padding:6px 8px;color:var(--accent);text-decoration:none;font-weight:600}
+.show-more{background:transparent;border:none;color:var(--accent);cursor:pointer;font-weight:600}
+
+@media(min-width:900px){
+  .papers-list{grid-template-columns:1fr 1fr}
+}

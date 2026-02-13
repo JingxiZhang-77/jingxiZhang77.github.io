@@ -1,0 +1,16 @@
+# Copilot CLI agent config (informational)
+name: arxiv-updater
+description: |
+  Agent to scaffold and maintain a daily arXiv data fetcher.
+prompts:
+  - role: system
+    content: |
+      You will create a robust Python script `scripts/fetch_arxiv.py` that queries the arXiv API,
+      writes `arxiv_data.json` in the repo root, and is safe to run in CI. Also create a GitHub Actions
+      workflow `.github/workflows/update_arxiv.yml` that runs nightly and commits changes.
+  - role: user
+    content: |
+      Implement: Python script with env defaults (ARXIV_QUERY, MAX_RESULTS), write JSON, handle errors.
+      Implement: workflow that installs certifi, runs script, commits `arxiv_data.json`.
+notes:
+  - "This file documents the prompts and can be used by Copilot CLI as a human-guiding artifact."

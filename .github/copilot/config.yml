@@ -1,0 +1,3 @@
+# Minimal Copilot CLI config referencing available agents (informational)
+agents:
+  - .github/copilot/agents/arxiv-agent.yml
