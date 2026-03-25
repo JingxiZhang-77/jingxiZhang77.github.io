@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tutorial: Automated Research Workflow with Multi-Agent AI</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .tutorial-content { max-width: 860px; margin: 32px auto; padding: 0 20px; }
+    .tutorial-content h1 { color: var(--accent); font-size: 26px; }
+    .tutorial-content h2 { color: #c03060; font-size: 20px; border-bottom: 2px solid #f1dbe2; padding-bottom: 6px; margin-top: 36px; }
+    .tutorial-content h3 { color: #333; font-size: 17px; margin-top: 24px; }
+    pre { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+    code { font-family: 'Fira Code', 'Cascadia Code', Consolas, monospace; }
+    p code, li code { background: #fce8ef; color: #c03060; padding: 2px 5px; border-radius: 4px; font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th { background: #ffd6e0; color: #333; padding: 8px 12px; text-align: left; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1dbe2; }
+    tr:hover td { background: #fff5f8; }
+    .toc { background: #fff5f8; border: 1px solid #f1dbe2; border-radius: 10px; padding: 18px 24px; margin-bottom: 32px; }
+    .toc h2 { margin-top: 0; font-size: 17px; }
+    .toc ol { margin: 0; padding-left: 20px; }
+    .toc li { margin: 4px 0; }
+    .toc a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .toc a:hover { text-decoration: underline; }
+    .tip { background: #f0fff4; border-left: 4px solid #4caf50; padding: 10px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 14px; }
+    .back-link { display: inline-block; margin-bottom: 20px; color: var(--accent); text-decoration: none; font-weight: 600; }
+    .back-link:hover { text-decoration: underline; }
+    .pipeline-box { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 13px; white-space: pre; overflow-x: auto; line-height: 1.5; }
+    .subtitle { color: var(--muted); font-style: italic; font-size: 16px; margin-top: -8px; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>My Coding Blog</h1>
+    <p class="tagline">Notes, assignments, and small projects.</p>
+    <nav style="margin-top:10px;">
+      <a href="./index.html" style="margin-right:14px;color:var(--accent);font-weight:600;">Home</a>
+      <a href="./posts.html" style="margin-right:14px;color:var(--accent);font-weight:600;">Posts</a>
+      <a href="./about.html" style="color:var(--accent);font-weight:600;">About</a>
+    </nav>
+  </header>
+
+  <div class="tutorial-content">
+    <a href="./posts.html" class="back-link">← Back to Posts</a>
+
+    <h1>Building an Automated Research Workflow with Multi-Agent AI</h1>
+    <p class="subtitle">A beginner-friendly guide to building an end-to-end AI pipeline that turns raw CSV data into a publication-ready JAMA Network Open paper — automatically.</p>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+      <h2>Table of Contents</h2>
+      <ol>
+        <li><a href="#what-is">What Is an Automated Research Workflow?</a></li>
+        <li><a href="#why-multi-agent">Why Multi-Agent Architecture?</a></li>
+        <li><a href="#overview">Overview of Our Workflow</a></li>
+        <li><a href="#agents">The Agents Explained</a></li>
+        <li><a href="#skills">The Skills Explained</a></li>
+        <li><a href="#orchestrator">The Orchestrator: Putting It All Together</a></li>
+        <li><a href="#worked-example">Worked Example: COVID-19 Vaccine Mandate Study</a></li>
+        <li><a href="#running">Running the Workflow Yourself</a></li>
+        <li><a href="#lessons">Design Lessons Learned</a></li>
+        <li><a href="#further">Going Further</a></li>
+      </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <h2 id="what-is">1. What Is an Automated Research Workflow?</h2>
+    <p>Traditional academic research takes months: you collect data, clean it, run statistics, draw figures, write sections, format citations, and compile a PDF — each step done manually. An <strong>automated research workflow</strong> uses AI agents and code to do all of this in minutes.</p>
+    <p>Think of it like an assembly line in a factory:</p>
+    <pre><code>Raw Data → [Data Exploration] → [Statistical Analysis] → [Visualization] → [Writing] → [PDF]</code></pre>
+    <p>Each station on the assembly line does one job well. When you feed in a new dataset, the whole line runs automatically and produces a finished paper at the end.</p>
+    <p>Our workflow can take any public health CSV dataset and output a formatted JAMA Network Open paper — including abstract, methods, results, figures, tables, discussion, and references — with <strong>zero manual editing</strong>.</p>
+
+    <!-- Section 2 -->
+    <h2 id="why-multi-agent">2. Why Multi-Agent Architecture?</h2>
+    <p>You might ask: why not just write one big Python script?</p>
+    <p>The problem with a monolithic script is that it becomes impossible to maintain, test, or reuse. If the statistics step breaks, everything breaks. If you want to swap out the visualization library, you have to rewrite half the code.</p>
+    <p><strong>Multi-agent design</strong> solves this by breaking the problem into specialized, independent agents:</p>
+    <table>
+      <tr><th>Principle</th><th>What it means in practice</th></tr>
+      <tr><td><strong>Single Responsibility</strong></td><td>Each agent does one thing and does it well</td></tr>
+      <tr><td><strong>Loose Coupling</strong></td><td>Agents communicate through a shared state dictionary, not direct calls</td></tr>
+      <tr><td><strong>Reusability</strong></td><td>The same <code>DataExplorationAgent</code> works for any dataset</td></tr>
+      <tr><td><strong>Testability</strong></td><td>You can test each agent in isolation</td></tr>
+    </table>
+    <p>This is the same pattern used by production AI systems at companies like Anthropic, Google DeepMind, and Microsoft Research.</p>
+
+    <!-- Section 3 -->
+    <h2 id="overview">3. Overview of Our Workflow</h2>
+    <p>Here is the full pipeline at a glance:</p>
+    <div class="pipeline-box">exam_folder_sample/data/
+        ↓
+┌─────────────────────────────┐
+│  WorkflowOrchestrator       │  ← The conductor
+│  (paper_orchestrator.py)    │
+└────────────┬────────────────┘
+             ↓
+    ┌─────────────────┐
+    │  Step 1:        │
+    │  DataExploration│  ← What's in the data?
+    │  Agent          │
+    └─────────┬───────┘
+             ↓ exploration summary
+    ┌─────────────────┐
+    │  Step 2:        │
+    │  Statistical    │  ← What do the numbers say?
+    │  Analysis Agent │
+    └─────────┬───────┘
+             ↓ stats results
+    ┌─────────────────┐
+    │  Step 3:        │
+    │  Visualization  │  ← How do we show it visually?
+    │  Generator      │
+    └─────────┬───────┘
+             ↓ figure metadata
+    ┌─────────────────┐
+    │  Step 4:        │
+    │  Content        │  ← How do we tell the story?
+    │  Generation     │
+    │  Agent          │
+    └─────────┬───────┘
+             ↓ LaTeX sections
+    ┌─────────────────┐
+    │  Step 5:        │
+    │  LaTeX          │  ← Compile to PDF
+    │  Compilation    │
+    │  Agent          │
+    └─────────┬───────┘
+             ↓
+        paper.pdf  ✓</div>
+    <p style="margin-top:14px;">The orchestrator holds a <code>workflow_state</code> dictionary that each agent reads from and writes to. This is the "shared memory" between agents — clean and explicit.</p>
+
+    <!-- Section 4 -->
+    <h2 id="agents">4. The Agents Explained</h2>
+
+    <h3>Agent 1: DataExplorationAgent</h3>
+    <p><strong>File:</strong> <code>workflow/agents/data_exploration_agent.py</code></p>
+    <p><strong>Job:</strong> Load CSV files and figure out what's inside them.</p>
+    <pre><code>agent = DataExplorationAgent(data_dir="exam_folder_sample/data")
+agent.explore()</code></pre>
+    <p><strong>What it does:</strong></p>
+    <ul>
+      <li>Scans a folder for all <code>.csv</code> files</li>
+      <li>Reads each file and detects column names</li>
+      <li>Classifies columns as <strong>numeric</strong>, <strong>categorical</strong>, or <strong>date</strong></li>
+      <li>Computes basic summary stats (min, max, unique values)</li>
+      <li>Identifies the "primary" dataset (the largest one)</li>
+    </ul>
+    <p><strong>Output (stored in workflow_state):</strong></p>
+    <pre><code>{
+  "numeric_cols": ["cases", "deaths", "population"],
+  "categorical_cols": ["state", "mandate_type"],
+  "date_cols": ["submission_date"],
+  "n_rows": 60000,
+  "n_cols": 15
+}</code></pre>
+    <div class="tip"><strong>Beginner tip:</strong> Think of this agent as a librarian who reads the table of contents of each book and writes a summary card for the orchestrator.</div>
+
+    <h3>Agent 2: StatisticalAnalysisAgent</h3>
+    <p><strong>File:</strong> <code>workflow/agents/statistical_analysis_agent.py</code></p>
+    <p><strong>Job:</strong> Run the numbers.</p>
+    <pre><code>agent = StatisticalAnalysisAgent(
+    data=workflow_state["primary_data"],
+    exploration=workflow_state["exploration"]
+)
+agent.analyze()</code></pre>
+    <p><strong>What it does:</strong></p>
+    <ul>
+      <li>Computes <strong>descriptive statistics</strong> (means, standard deviations, 95% confidence intervals)</li>
+      <li>Runs <strong>linear regressions</strong> between numeric variables</li>
+      <li>Performs <strong>comparative tests</strong> (t-tests, group comparisons)</li>
+      <li>Returns structured results with p-values and effect sizes</li>
+    </ul>
+    <pre><code>{
+  "descriptive_stats": [
+    {"variable": "cases", "mean": 1234.5, "ci_lower": 1100, "ci_upper": 1369}
+  ],
+  "regressions": [
+    {"outcome": "deaths", "predictor": "cases", "coef": 0.042, "p_value": 0.001}
+  ],
+  "comparisons": [
+    {"variable": "cases", "group1": "mandate", "group2": "no_mandate", "p_value": 0.03}
+  ]
+}</code></pre>
+    <div class="tip"><strong>Beginner tip:</strong> This agent is like a statistician who runs the analyses a journal reviewer would expect to see in a methods section.</div>
+
+    <h3>Agent 3: VisualizationGenerator</h3>
+    <p><strong>File:</strong> <code>workflow/code/visualization_generator.py</code></p>
+    <p><strong>Job:</strong> Create publication-quality figures.</p>
+    <pre><code>viz = VisualizationGenerator(figures_dir="exam_paper/output/figures")
+viz.time_series_plot(df, x_col="date", y_col="cases", title="COVID Cases Over Time", filename="fig1")</code></pre>
+    <p><strong>Chart selection logic:</strong></p>
+    <table>
+      <tr><th>Data pattern</th><th>Chart chosen</th></tr>
+      <tr><td>Date column + numeric column</td><td>Time series line chart</td></tr>
+      <tr><td>Two numeric columns, correlated</td><td>Scatter plot with trend line</td></tr>
+      <tr><td>Many numeric columns</td><td>Correlation heatmap</td></tr>
+      <tr><td>Categorical + numeric, 2–6 groups</td><td>Box plot comparison</td></tr>
+      <tr><td>Single numeric column, 12+ unique values</td><td>Distribution histogram</td></tr>
+    </table>
+    <div class="tip"><strong>Beginner tip:</strong> The agent picks charts the same way an experienced researcher would — prioritizing clarity and scientific value over decoration.</div>
+
+    <h3>Agent 4: ContentGenerationAgent</h3>
+    <p><strong>File:</strong> <code>workflow/agents/content_generation_agent.py</code></p>
+    <p><strong>Job:</strong> Write the paper sections.</p>
+    <pre><code>agent = ContentGenerationAgent(
+    data=primary_data,
+    exploration=exploration_summary,
+    statistics=stats_agent,
+    visualizations=figure_metadata
+)
+agent.generate_all()</code></pre>
+    <p><strong>Generates all required JAMA Network Open sections:</strong> Title, Abstract, Key Points, Introduction, Methods, Results, Discussion, Limitations, Conclusions, and References.</p>
+    <div class="tip"><strong>Beginner tip:</strong> This is the most complex agent. It takes the structured output from the previous agents and fills in a scientific narrative. All content is generated from the actual data — nothing is hardcoded.</div>
+
+    <h3>Agent 5: LaTeXCompilationAgent</h3>
+    <p><strong>File:</strong> <code>workflow/agents/latex_compilation_agent.py</code></p>
+    <p><strong>Job:</strong> Assemble the paper and compile to PDF.</p>
+    <pre><code>agent = LaTeXCompilationAgent(
+    output_dir="exam_paper/output",
+    template_path="sample/tex/template.tex"
+)
+agent.compile(sections=workflow_state["sections"])</code></pre>
+    <p>Takes the JAMA LaTeX template, inserts generated sections, embeds figure references, and calls <code>pdflatex</code> to compile the <code>.tex</code> into a <code>.pdf</code>.</p>
+    <div class="tip"><strong>Beginner tip:</strong> Think of this agent as a typesetter who takes your manuscript and lays it out in the journal's official style.</div>
+
+    <!-- Section 5 -->
+    <h2 id="skills">5. The Skills Explained</h2>
+    <p><strong>Skills</strong> are reusable utility functions that agents call internally. Unlike agents (which run a full pipeline step), skills are small, focused tools.</p>
+    <table>
+      <tr><th>Skill file</th><th>What it provides</th></tr>
+      <tr><td><code>data_loading_exploration.py</code></td><td><code>load_csv()</code> and <code>explore_dataframe()</code> — low-level functions for DataExplorationAgent</td></tr>
+      <tr><td><code>statistical_summary.py</code></td><td><code>descriptive_stats()</code>, <code>grouped_summary()</code> — summary tables for any DataFrame</td></tr>
+      <tr><td><code>figure_generation.py</code></td><td><code>save_figure()</code> and <code>apply_publication_style()</code> — matplotlib styling at 300 DPI</td></tr>
+      <tr><td><code>section_writing.py</code></td><td>Section templates that enforce JAMA's required structure</td></tr>
+    </table>
+    <pre><code>Agent (orchestrates the logic)
+  └── calls Skills (do the individual work)
+        └── Skills return structured data back to Agent</code></pre>
+
+    <!-- Section 6 -->
+    <h2 id="orchestrator">6. The Orchestrator: Putting It All Together</h2>
+    <p>The <strong>orchestrator</strong> (<code>paper_orchestrator.py</code>) is the conductor of the whole workflow. It initializes each agent in sequence, passes outputs from one agent as inputs to the next, and stores everything in a shared <code>workflow_state</code> dictionary.</p>
+    <pre><code># The whole workflow in 5 lines:
+orch = WorkflowOrchestrator(
+    data_dir="exam_folder_sample/data",
+    output_dir="exam_paper/output",
+    template_path="sample/tex/template.tex",
+)
+orch.execute()</code></pre>
+    <p><strong>The <code>workflow_state</code> dictionary</strong> acts as the memory of the pipeline:</p>
+    <pre><code>workflow_state = {
+    "primary_data": [...],      # Rows from the largest CSV
+    "exploration":  {...},      # Column types, counts, summary
+    "statistics":   stats_agent,# Agent object with results
+    "visualizations": [...],    # Figure metadata list
+    "sections": {               # Generated paper text
+        "title":    "...",
+        "abstract": "...",
+        "methods":  "...",
+        ...
+    }
+}</code></pre>
+
+    <!-- Section 7 -->
+    <h2 id="worked-example">7. Worked Example: COVID-19 Vaccine Mandate Study</h2>
+    <p><strong>Input data:</strong></p>
+    <ul>
+      <li><code>United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv</code> — daily COVID case/death counts by state</li>
+      <li><code>hcw_mandates_table.csv</code> — healthcare worker vaccine mandate policies by state</li>
+      <li><code>NST-EST2024-POP.xlsx</code> — US state population estimates</li>
+    </ul>
+    <pre><code>Step 1 – Data Exploration:
+✓ Loaded cases.csv: 60,016 rows × 15 columns
+  → Numeric cols: new_cases, new_deaths, tot_cases, tot_death (4 cols)
+  → Date cols: submission_date (1 col)
+  → Categorical cols: state, consent_cases (10 cols)
+
+Step 2 – Statistical Analysis:
+✓ Descriptive stats computed: 4 variables
+  → new_cases: Mean=1234.5, 95% CI (1180.2–1288.8)
+✓ Regressions computed: 2 models
+  → new_deaths ~ new_cases: β=0.042, p&lt;0.001
+✓ Comparisons: new_cases by mandate status: p=0.031
+
+Step 3 – Visualization:
+Candidates evaluated: 5
+  → Event study (score: 1.02) — highest scored
+  → Distribution (score: 0.74) — second highest
+✓ figures/primary_event_study.pdf
+✓ figures/primary_distribution.pdf
+
+Step 4 – Content Generation:
+✓ Sections generated: 11
+  → title, abstract, key_points, introduction
+  → methods, results, figures, tables
+  → discussion, limitations, conclusions, references
+
+Step 5 – LaTeX Compilation:
+✓ paper.tex written (42.3 KB)
+✓ pdflatex compilation successful
+✓ paper.pdf generated (1.2 MB)
+
+Total time: ~3–5 minutes.</code></pre>
+
+    <!-- Section 8 -->
+    <h2 id="running">8. Running the Workflow Yourself</h2>
+    <h3>Prerequisites</h3>
+    <pre><code># Python 3.9+
+pip install -r requirements.txt
+
+# LaTeX (for PDF compilation)
+# macOS:   brew install --cask mactex
+# Ubuntu:  sudo apt-get install texlive-full
+# Windows: Install MiKTeX from https://miktex.org/</code></pre>
+    <h3>Quick Start</h3>
+    <pre><code># Clone the repository
+git clone &lt;your-repo-url&gt;
+cd midterm-project-committhenpray
+
+# Put your data in the data folder
+cp your_data.csv exam_folder_sample/data/
+
+# Run the full pipeline
+python workflow/code/paper_orchestrator.py
+
+# Output appears here:
+ls exam_paper/output/
+# paper.tex  paper.pdf  figures/</code></pre>
+    <h3>Running Step by Step (for debugging)</h3>
+    <pre><code>from pathlib import Path
+from workflow.agents.data_exploration_agent import DataExplorationAgent
+from workflow.agents.statistical_analysis_agent import StatisticalAnalysisAgent
+
+# Step 1 only
+agent = DataExplorationAgent("exam_folder_sample/data")
+agent.explore()
+print(agent.get_analysis("your_dataset_name"))
+
+# Step 2 only (needs Step 1 output)
+stats = StatisticalAnalysisAgent(agent.datasets["your_dataset"], agent.get_analysis("your_dataset"))
+stats.analyze()
+print(stats.get_primary_results())</code></pre>
+    <h3>Expected Runtimes</h3>
+    <table>
+      <tr><th>Dataset size</th><th>Typical runtime</th></tr>
+      <tr><td>&lt; 1,000 rows</td><td>~1 minute</td></tr>
+      <tr><td>1,000–10,000 rows</td><td>~2–3 minutes</td></tr>
+      <tr><td>10,000–100,000 rows</td><td>~4–6 minutes</td></tr>
+    </table>
+
+    <!-- Section 9 -->
+    <h2 id="lessons">9. Design Lessons Learned</h2>
+    <h3>Lesson 1: Fail Fast and Fail Clearly</h3>
+    <p>Each agent returns <code>True</code> or <code>False</code>. The orchestrator checks after every step so a bad dataset fails immediately — not after 10 minutes of wasted computation.</p>
+    <pre><code>if not self._step_data_exploration():
+    print("✗ Data exploration failed")
+    return False</code></pre>
+
+    <h3>Lesson 2: Don't Hardcode Anything</h3>
+    <p>Hardcoding column names like <code>df["state"]</code> is fragile. Our agents use <strong>automatic column type detection</strong> — they figure out what's a number, what's a date, what's a category. This is what makes the same workflow work on completely different datasets.</p>
+
+    <h3>Lesson 3: Score and Select, Don't Blindly Generate</h3>
+    <p>The visualization agent evaluates 5+ candidate chart types and picks the best 2. This <strong>scoring approach</strong> produces better figures than generating everything and overwhelming the reader.</p>
+
+    <h3>Lesson 4: Shared State Over Direct Coupling</h3>
+    <p>Agents don't call each other directly. They all read/write a central <code>workflow_state</code> dictionary. Adding a new step only requires adding a new key — no existing agents change.</p>
+
+    <h3>Lesson 5: Use Templates for Consistent Output</h3>
+    <p>The LaTeX template ensures the paper always looks like a real JAMA article. The content generation agent doesn't need to know anything about LaTeX — it just writes text, and the compilation agent handles formatting.</p>
+
+    <!-- Section 10 -->
+    <h2 id="further">10. Going Further</h2>
+    <table>
+      <tr><th>Extension</th><th>How to do it</th></tr>
+      <tr><td><strong>Literature review</strong></td><td>Add a <code>LiteratureSearchAgent</code> that calls PubMed/CrossRef APIs</td></tr>
+      <tr><td><strong>AI-enhanced writing</strong></td><td>Connect <code>ContentGenerationAgent</code> to Claude API for richer prose</td></tr>
+      <tr><td><strong>Peer review simulation</strong></td><td>Add a <code>ReviewingAgent</code> that checks the paper against JAMA guidelines</td></tr>
+      <tr><td><strong>Slides generation</strong></td><td>Add a <code>PresentationAgent</code> that creates a PowerPoint from the sections</td></tr>
+      <tr><td><strong>Interactive dashboard</strong></td><td>Add a <code>WebDashboardAgent</code> that builds a Plotly/Dash website</td></tr>
+      <tr><td><strong>Multi-paper workflow</strong></td><td>Run the pipeline on 10 datasets in parallel and compare results</td></tr>
+    </table>
+
+    <h2>Summary</h2>
+    <p>You now know how to:</p>
+    <ul>
+      <li>Design a multi-agent AI research workflow</li>
+      <li>Organize agents (big steps) vs skills (small reusable tools)</li>
+      <li>Use an orchestrator to coordinate agents through shared state</li>
+      <li>Build agents for data exploration, statistical analysis, visualization, writing, and LaTeX compilation</li>
+      <li>Run the complete pipeline on any public health dataset</li>
+    </ul>
+    <p>The key insight is: <strong>each agent is responsible for one research activity</strong>, and the orchestrator is just the glue that connects them in sequence. You can swap out any agent, improve it, or replace it without touching the rest of the pipeline.</p>
+
+    <a href="./posts.html" class="back-link" style="margin-top:32px; display:inline-block;">← Back to Posts</a>
+  </div>
+
+  <footer class="site-footer">
+    <p>© <span id="y"></span> My Coding Blog</p>
+  </footer>
+  <script>document.getElementById("y").textContent = new Date().getFullYear();</script>
+</body>
+</html>
